@@ -20,6 +20,12 @@ let package = Package(
         .package(url: "https://github.com/OpenSwiftUIProject/OpenGraph.git", from:  "0.0.1"),
     ],
     targets: [
+        .executableTarget(
+            name: "DemoApp",
+            dependencies: [
+                "AGDebugKit"
+            ]
+        ),
         .target(
             name: "AGDebugKit",
             dependencies: [
@@ -28,6 +34,10 @@ let package = Package(
             swiftSettings: [
                 .enableExperimentalFeature("AccessLevelOnImport"),
             ]
+        ),
+        .testTarget(
+            name: "AGDebugKitTests",
+            dependencies: ["AGDebugKit"]
         ),
     ]
 )
