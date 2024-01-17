@@ -9,3 +9,9 @@ For SwiftUI debug information, see [SwiftUIViewDebug](https://github.com/OpenSwi
 - [ ] AGGraphDescription
 - [ ] AGGraphCreate
 - [ ] AGDebugServer
+
+## Example
+
+![Demo App](Resources/demo_app.png)
+
+![Demo JSON](Resources/demo_json.png)

@@ -10,12 +10,16 @@ import AGDebugKit
 
 @main
 @available(macOS 11.0, *)
-struct DemoApp: App {    
+struct DemoApp: App {
+    init() {
+        archiveGraph(name: "init.json")
+    }
+    
     var body: some Scene {
         WindowGroup {
             Text("Demo")
                 .onTapGesture {
-                    archiveGraph(name: "test.json")
+                    archiveGraph(name: "demo.json")
                 }
         }
     }
