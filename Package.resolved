@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "openfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OpenSwiftUIProject/OpenFoundation",
+      "state" : {
+        "revision" : "cd2cdb300d53e3e68fda8b690a703a7c5096d9d0",
+        "version" : "0.0.2"
+      }
+    },
+    {
+      "identity" : "opengraph",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OpenSwiftUIProject/OpenGraph.git",
+      "state" : {
+        "revision" : "a236ef8724918dc7cd3e94e0fa492852ee0e1165",
+        "version" : "0.0.1"
+      }
+    }
+  ],
+  "version" : 2
+}
