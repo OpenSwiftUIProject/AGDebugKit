@@ -8,3 +8,4 @@ For SwiftUI debug information, see [SwiftUIViewDebug](https://github.com/OpenSwi
 - [ ] AGGraphGetAttributeGraph
 - [ ] AGGraphDescription
 - [ ] AGGraphCreate
+- [ ] AGDebugServer
