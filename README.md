@@ -8,6 +8,10 @@ If you need SwiftUI debug information, you can refer to [SwiftUIViewDebug](https
 
 ## Example
 
-![Demo App](Resources/demo_app.png)
+![Demo App Console](Resources/demo_app.png)
+
+![Demo App Screenshot](Resources/demo_app_2.png)
 
 ![Demo JSON](Resources/demo_json.png)
+
+![Debug Client Screenshot](Resources/debug_client.png)
