@@ -18,14 +18,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/OpenSwiftUIProject/OpenGraph.git", from: "0.0.2"),
+        .package(path: "../Socket"),
+//        .package(url: "https://github.com/PureSwift/Socket.git", branch: "main"),
     ],
     targets: [
-        .executableTarget(
-            name: "DemoApp",
-            dependencies: [
-                "AGDebugKit"
-            ]
-        ),
         .target(
             name: "AGDebugKit",
             dependencies: [
@@ -33,6 +29,21 @@ let package = Package(
             ],
             swiftSettings: [
                 .enableExperimentalFeature("AccessLevelOnImport"),
+            ]
+        ),
+        // A demo app showing how to use AGDebugKit
+        .executableTarget(
+            name: "DemoApp",
+            dependencies: [
+                "AGDebugKit",
+            ]
+        ),
+        // A client sending command to AGDebugServer
+        .executableTarget(
+            name: "DebugClient",
+            dependencies: [
+                "AGDebugKit",
+                .product(name: "Socket", package: "Socket"),
             ]
         ),
         .testTarget(
