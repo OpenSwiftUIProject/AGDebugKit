@@ -14,8 +14,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OpenSwiftUIProject/OpenGraph.git",
       "state" : {
-        "revision" : "98f4a8f0389e554041f392ade7777aeb5812b66b",
-        "version" : "0.0.2"
+        "revision" : "f88a3c15c0385d580d61b43d8af32923ef2667f6",
+        "version" : "0.0.3"
+      }
+    },
+    {
+      "identity" : "socket",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OpenSwiftUIProject/Socket.git",
+      "state" : {
+        "revision" : "e81b4bd0415060e89decb90461cfc117f0e6d8d0",
+        "version" : "0.3.3"
       }
     },
     {
