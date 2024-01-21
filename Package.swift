@@ -17,7 +17,7 @@ let package = Package(
         .library(name: "AGDebugKit", targets: ["AGDebugKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/OpenSwiftUIProject/OpenGraph.git", from:  "0.0.1"),
+        .package(url: "https://github.com/OpenSwiftUIProject/OpenGraph.git", from: "0.0.2"),
     ],
     targets: [
         .executableTarget(
