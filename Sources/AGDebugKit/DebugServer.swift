@@ -13,8 +13,8 @@ public final class DebugServer {
     
     public static let shared = DebugServer()
     
-    public func start(_ mode: UInt = 1) {
-        server = debugServerStart(mode)
+    public func start(_ mode: Mode = .local) {
+        server = debugServerStart(mode.rawValue)
     }
     
     public func stop() {

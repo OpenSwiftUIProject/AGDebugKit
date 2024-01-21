@@ -15,6 +15,7 @@ struct ContentView: View {
     private let logger = Logger(subsystem: "org.OpenSwiftUIProject.AGDebugKit", category: "DebugClient")
     
     @State private var started = false
+    @State private var selectedMode: Mode = .local
     @State private var timeout = 1
 
     @State private var host = ""
@@ -30,37 +31,58 @@ struct ContentView: View {
         socket == nil || token == 0
     }
     
+    @State private var selectedCommand: Command = .graphDescription
+    @State private var commandLocked = false
+    
     var body: some View {
         Form {
             Section {
                 Text("Status: \(started.description) ") + Text("⏺").foregroundStyle(started ? .green : .red)
-                Button {
-                    DebugServer.shared.start()
-                    started = DebugServer.shared.startSuccess
-                    if started,
-                       let url = DebugServer.shared.url,
-                       let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-                        if let host = components.host {
-                            self.host = host
+                HStack {
+                    Button {
+                        DebugServer.shared.start(selectedMode)
+                        started = DebugServer.shared.startSuccess
+                        if started,
+                           let url = DebugServer.shared.url,
+                           let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                            if let host = components.host {
+                                self.host = host
+                            }
+                            if let port = components.port {
+                                self.port = UInt16(port)
+                            }
+                            if let queryItems = components.queryItems,
+                               let tokenItem = queryItems.first(where: { $0.name == "token" }),
+                               let tokenValue = tokenItem.value,
+                               let token = Int(tokenValue) {
+                                self.token = token
+                            }
                         }
-                        if let port = components.port {
-                            self.port = UInt16(port)
-                        }
-                        if let queryItems = components.queryItems,
-                           let tokenItem = queryItems.first(where: { $0.name == "token" }),
-                           let tokenValue = tokenItem.value,
-                           let token = Int(tokenValue) {
-                            self.token = token
-                        }
+                    } label: {
+                        Text("Start debug server")
                     }
-                    
-                } label: {
-                    Text("Start debug server")
+                    Spacer()
+                    Picker(selection: $selectedMode) {
+                        Text("local").tag(Mode.local)
+                        Text("network").tag(Mode.network)
+                    } label: {
+                        Text("Mode")
+                    }
+                    .pickerStyle(.segmented)
+                    .disabled(started)
                 }
-                Button("Run debug server") {
-                    DebugServer.shared.run(timeout: timeout)
+                HStack {
+                    Button("Run debug server") {
+                        DebugServer.shared.run(timeout: timeout)
+                    }
+                    Spacer()
+                    Stepper("Timeout \(timeout)", value: $timeout)
                 }
-                Stepper("Timeout \(timeout)", value: $timeout)
+                
+                Button("Stop debug server") {
+                    DebugServer.shared.stop()
+                    started = DebugServer.shared.startSuccess
+                }
             }
             Section {
                 TextField("Host", text: $host)
@@ -73,12 +95,27 @@ struct ContentView: View {
             
             Section {
                 TextField("Token", value: $token, formatter: NumberFormatter())
+                Picker(selection: $selectedCommand) {
+                    ForEach(Command.allCases) { command in
+                        Text(command.rawValue).tag(command)
+                    }
+                } label: {
+                    Text("Command")
+                }
+                .pickerStyle(.segmented)
+                .disabled(commandLocked)
                 Button("Write Data") {
-                    Task { try await writeData() }
+                    Task {
+                        try await writeData()
+                        commandLocked = true
+                    }
                 }
                 .disabled(serverIODisable)
                 Button("Read Data") {
-                    Task { try await readData() }
+                    Task {
+                        try await readData()
+                        commandLocked = false
+                    }
                 }
                 .disabled(serverIODisable)
             }
@@ -101,31 +138,20 @@ struct ContentView: View {
         }
     }
     
-    struct DebugServerMessageHeader: Codable {
-        var token: UInt32
-        var unknown: UInt32
-        var length: UInt32
-        var unknown2: UInt32
-        init(token: UInt32, length: UInt32) {
-            self.token = token
-            self.unknown = 0
-            self.length = length
-            self.unknown2 = 0
-        }
-        
-        static var size: Int { MemoryLayout<Self>.size }
-    }
+    typealias Mode = DebugServer.Mode
+    typealias Header = DebugServer.MessageHeader
+    typealias Command = DebugServer.Command
     
     /// "graph/description" command is the same as `Graph().dict`
-    func writeData(command: String = "graph/description") async throws {
+    func writeData(command: Command = .graphDescription) async throws {
         guard let socket else { return }
-        let command = ["command": command]
+        let command = ["command": command.rawValue]
         let commandData = try JSONSerialization.data(withJSONObject: command)
         let size = commandData.count
         
-        let header = DebugServerMessageHeader(token: UInt32(token), length: UInt32(size))
+        let header = Header(token: UInt32(token), length: UInt32(size))
         let headerData = withUnsafePointer(to: header) {
-            Data(bytes: UnsafeRawPointer($0), count: DebugServerMessageHeader.size)
+            Data(bytes: UnsafeRawPointer($0), count: Header.size)
         }
         do {
             let byteCount = try await socket.write(headerData)
@@ -145,11 +171,11 @@ struct ContentView: View {
     
     func readData() async throws {
         guard let socket else { return }
-        let headerData = try await socket.read(DebugServerMessageHeader.size)
+        let headerData = try await socket.read(Header.size)
         
         let header = headerData.withUnsafeBytes { pointer in
             pointer.baseAddress!
-                .assumingMemoryBound(to: DebugServerMessageHeader.self)
+                .assumingMemoryBound(to: Header.self)
                 .pointee
         }
         guard header.token == token else {
