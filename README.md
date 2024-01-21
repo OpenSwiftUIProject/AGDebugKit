@@ -2,20 +2,16 @@
 
 A package to get debug information from the private AttributeGraph framework behind SwiftUI.
 
-For visualization the JSON result, see [GraphConverter](https://github.com/OpenSwiftUIProject/GraphConverter)
+If you need JSON result visualization, you can refer to [GraphConverter](https://github.com/OpenSwiftUIProject/GraphConverter)
 
-For SwiftUI debug information, see [SwiftUIViewDebug](https://github.com/OpenSwiftUIProject/SwiftUIViewDebug)
+If you need SwiftUI debug information, you can refer to [SwiftUIViewDebug](https://github.com/OpenSwiftUIProject/SwiftUIViewDebug)
 
 ## Example
 
-![Demo App](Resources/demo_app.png)
+![Demo App Console](Resources/demo_app.png)
+
+![Demo App Screenshot](Resources/demo_app_2.png)
 
 ![Demo JSON](Resources/demo_json.png)
 
-## TODO
-
-- [ ] AGDescriptionFormat
-- [ ] AGGraphGetAttributeGraph
-- [ ] AGGraphDescription
-- [ ] AGGraphCreate
-- [ ] AGDebugServer
+![Debug Client Screenshot](Resources/debug_client.png)
