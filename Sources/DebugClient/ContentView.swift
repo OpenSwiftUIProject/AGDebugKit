@@ -33,6 +33,9 @@ struct ContentView: View {
     
     @State private var selectedCommand: Command = .graphDescription
     @State private var commandLocked = false
+
+    @State private var output = ""
+    @State private var outputDate: Date?
     
     var body: some View {
         Form {
@@ -92,7 +95,6 @@ struct ContentView: View {
                 }
                 .disabled(connectServerDisable)
             }
-            
             Section {
                 TextField("Token", value: $token, formatter: NumberFormatter())
                 Picker(selection: $selectedCommand) {
@@ -118,6 +120,14 @@ struct ContentView: View {
                     }
                 }
                 .disabled(serverIODisable)
+            }
+            Section {
+                Text(output)
+                    .multilineTextAlignment(.leading)
+            } footer: {
+                if let outputDate {
+                    Text("\(outputDate, format: .dateTime)")
+                }
             }
         }
         .buttonStyle(.bordered)
@@ -186,7 +196,10 @@ struct ContentView: View {
         let dictionaryData = try await socket.read(Int(size))
         let dict = try JSONSerialization.jsonObject(with: dictionaryData) as? NSDictionary
         if let dict {
-            print(dict)
+            let dictDescription = dict.description
+            logger.info("Received: \(dictDescription)")
+            output = dictDescription
+            outputDate = Date.now
         }
     }
 }
