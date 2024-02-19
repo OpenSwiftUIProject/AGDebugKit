@@ -9,29 +9,29 @@ private import AttributeGraph
 import Foundation
 
 public final class DebugServer {
-    private var server: UnsafeRawPointer?
+    private var server: AGDebugServer?
     
     public static let shared = DebugServer()
     
     public func start(_ mode: Mode = .local) {
-        server = debugServerStart(mode.rawValue)
+        server = AGDebugServer.start(mode: 0)?.takeUnretainedValue()
     }
     
     public func stop() {
-        debugServerStop()
+        AGDebugServer.stop()
         server = nil
     }
     
-    public func run(timeout: Int) {
+    public func run(timeout: Int32) {
         guard let _ = server else { return }
-        debugServerRun(timeout)
+        AGDebugServer.run(timeout: timeout)
     }
     
     public var url: URL? {
         guard let _ = server,
-              let url = debugServerCopyURL() as? URL
+              let url = AGDebugServer.copyURL()
         else { return nil }
-        return url
+        return url.takeUnretainedValue() as URL
     }
     
     /// A Bool value indicating whether the server has been started successfully

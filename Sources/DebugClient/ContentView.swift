@@ -16,7 +16,7 @@ struct ContentView: View {
     
     @State private var started = false
     @State private var selectedMode: Mode = .local
-    @State private var timeout = 1
+    @State private var timeout: Int32 = 1
 
     @State private var host = ""
     @State private var port: UInt16 = 0
