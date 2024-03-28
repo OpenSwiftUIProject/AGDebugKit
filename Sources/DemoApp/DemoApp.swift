@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import AGDebugKit
 
 @main
 @available(macOS 14.0, *)
@@ -17,19 +16,6 @@ struct DemoApp: App {
             NSApp.setActivationPolicy(.regular)
             NSApp.activate(ignoringOtherApps: true)
             NSApp.windows.first?.makeKeyAndOrderFront(nil)
-        }
-        
-        // Demo test code
-        let emptyGraph = Graph()
-        if let dict = emptyGraph.dict {
-            print(dict)
-        }
-        let defaultGraph = Graph(nil)
-        if let dict = defaultGraph.dict {
-            print(dict)
-        }
-        if let dot = defaultGraph.dot {
-            print(dot)
         }
     }
     

@@ -10,19 +10,18 @@ import Foundation
 
 /// A wrapper class for AGGraph
 public final class Graph {
-    private let graph: AGGraph?
+    private unowned let graph: AGGraph?
     
     public init() {
         graph = nil
     }
     
     public init(_ pointer: UnsafeRawPointer?) {
-        if let pointer {
-            let sharedGraph = pointer.assumingMemoryBound(to: AGGraph.self).pointee
-            graph = AGGraph(shared: sharedGraph)
-        } else {
-            graph = AGGraph()
-        }
+        graph = pointer?.assumingMemoryBound(to: AGGraph.self).pointee
+    }
+    
+    public init(bitPattern: Int) {
+        graph = Unmanaged<AGGraph>.fromOpaque(.init(bitPattern: bitPattern)!).takeUnretainedValue()
     }
     
     public var dict: NSDictionary? {
@@ -53,5 +52,22 @@ public final class Graph {
     /// [GraphConverter](https://github.com/OpenSwiftUIProject/GraphConverter)
     public static func archiveGraph(name: String) {
         name.withCString { AGGraph.archiveJSON(name: $0) }
+    }
+    
+    /// Command to transform dot file to svg
+    /// 1. Install graphviz
+    /// 2. Execuate `dot -Tsvg xx.dot > xx.svg`
+    public static func _graphExport(_ bitPattern: Int, name: String = "aggraph_export.dot") {
+        // TODO: How to get the current in memory's AGGraphStorage objects?
+        // Currently we just use Xcode Memory Graph and use any of the AGGraphStorage's address
+        let graph = Graph(bitPattern: bitPattern)
+        let dot = graph.dot ?? ""
+        let path = URL(fileURLWithPath: "\(NSTemporaryDirectory())/\(name)")
+        do {
+            try dot.write(to: path, atomically: true, encoding: .utf8)
+            print(#"Wrote graph data to "\#(path.absoluteString)""#)
+        } catch {
+            print("Error writing to file: \(error)")
+        }
     }
 }

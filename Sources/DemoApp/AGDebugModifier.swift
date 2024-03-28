@@ -6,16 +6,25 @@
 //
 
 import AGDebugKit
+import AttributeGraph
 import SwiftUI
 
 @available(macOS 13, *)
 struct AGDebugItem: Equatable, Identifiable {
     var url: URL
-    
-    init(name: String) {
-        url = URL(filePath: NSTemporaryDirectory().appending("\(name).json"))
+    var format: Format
+
+    enum Format: String, CaseIterable, Identifiable {
+        var id: String { rawValue }
+        
+        case json, dot
     }
-    
+
+    init(name: String, format: Format) {
+        url = URL(filePath: NSTemporaryDirectory().appending("\(name).\(format.rawValue)"))
+        self.format = format
+    }
+
     var id: String { url.absoluteString }
 }
 
@@ -24,12 +33,26 @@ struct AGDebugModifier: ViewModifier {
     @State private var showInspector = false
     @State private var items: [AGDebugItem] = []
 
+    fileprivate static var sharedGraphbitPattern: Int = 0
+    @State private var format: AGDebugItem.Format = .dot
+
     func body(content: Content) -> some View {
         content
             .toolbar {
+                Picker("Format", selection: $format) {
+                    ForEach(AGDebugItem.Format.allCases) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }.pickerStyle(.segmented)
                 Button {
-                    let item = AGDebugItem(name: Date.now.ISO8601Format())
-                    Graph.archiveGraph(name: item.url.lastPathComponent)
+                    let item = AGDebugItem(name: Date.now.ISO8601Format(), format: format)
+                    let name = item.url.lastPathComponent
+                    switch format {
+                    case .json:
+                        Graph.archiveGraph(name: name)
+                    case .dot:
+                        Graph._graphExport(AGDebugModifier.sharedGraphbitPattern, name: name)
+                    }
                     items.append(item)
                 } label: {
                     Image(systemName: "doc.badge.plus")
@@ -43,6 +66,7 @@ struct AGDebugModifier: ViewModifier {
             .inspector(isPresented: $showInspector) {
                 inspectorView
             }
+            .overlay { _GraphFetcher() }
     }
     
     private var inspectorView: some View {
@@ -89,16 +113,16 @@ struct AGDebugModifier: ViewModifier {
     private func openAction(_ url: URL) {
         _ = NSWorkspace.shared.open(url)
     }
-    
+
     // MARK: - Move
-    
+
     @State private var moving = false
     @State private var moveURL: URL?
     private func moveAction(_ url: URL) {
         moveURL = url
         moving = true
     }
-    
+
     // MARK: - Delete
 
     private func deleteAction(_ url: URL) throws {
@@ -111,5 +135,30 @@ extension View {
     @available(macOS 14, *)
     func agDebug() -> some View {
         modifier(AGDebugModifier())
+    }
+}
+
+struct _GraphFetcher: View {
+    var body: Never { fatalError("Unimplemented") }
+
+    static func _makeView(view: _GraphValue<Self>, inputs: _ViewInputs) -> _ViewOutputs {
+        if let current = AGSubgraph.current {
+            let graph = current.graph
+            if #available(macOS 14, *) {
+                AGDebugModifier.sharedGraphbitPattern = unsafeBitCast(graph, to: Int.self)
+            }
+        }
+
+        return withUnsafePointer(to: view) { pointer in
+            let view = UnsafeRawPointer(pointer).assumingMemoryBound(to: _GraphValue<EmptyView>.self)
+            return EmptyView._makeView(view: view.pointee, inputs: inputs)
+        }
+    }
+
+    static func _makeViewList(view: _GraphValue<Self>, inputs: _ViewListInputs) -> _ViewListOutputs {
+        withUnsafePointer(to: view) { pointer in
+            let view = UnsafeRawPointer(pointer).assumingMemoryBound(to: _GraphValue<EmptyView>.self)
+            return EmptyView._makeViewList(view: view.pointee, inputs: inputs)
+        }
     }
 }
