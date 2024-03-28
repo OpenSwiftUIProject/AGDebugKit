@@ -54,9 +54,9 @@ public final class Graph {
         name.withCString { AGGraph.archiveJSON(name: $0) }
     }
     
-    /// Command to transform dot file to svg
-    /// 1. Install graphviz
-    /// 2. Execuate `dot -Tsvg xx.dot > xx.svg`
+    /// How to consume dot file?
+    /// 1. Transform it to svg or other formats locally via: Install `graphviz` and execuate `dot -Tsvg xx.dot > xx.svg`
+    /// 2. View it on online via some site like https://dreampuf.github.io/GraphvizOnline
     public static func _graphExport(_ bitPattern: Int, name: String = "aggraph_export.dot") {
         // TODO: How to get the current in memory's AGGraphStorage objects?
         // Currently we just use Xcode Memory Graph and use any of the AGGraphStorage's address

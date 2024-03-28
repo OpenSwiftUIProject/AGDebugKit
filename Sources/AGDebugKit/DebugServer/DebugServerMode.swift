@@ -9,9 +9,9 @@ extension DebugServer {
     /// The run mode of DebugServer
     ///
     public struct Mode: RawRepresentable, Hashable {
-        public let rawValue: UInt
+        public let rawValue: UInt32
         
-        public init(rawValue: UInt) {
+        public init(rawValue: UInt32) {
             self.rawValue = rawValue
         }
 

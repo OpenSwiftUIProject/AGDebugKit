@@ -14,7 +14,7 @@ public final class DebugServer {
     public static let shared = DebugServer()
     
     public func start(_ mode: Mode = .local) {
-        server = AGDebugServer.start(mode: 0)?.takeUnretainedValue()
+        server = AGDebugServer.start(mode: mode.rawValue)
     }
     
     public func stop() {
