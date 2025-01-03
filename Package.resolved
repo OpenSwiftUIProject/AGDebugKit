@@ -1,12 +1,13 @@
 {
+  "originHash" : "a32662a9b70c037f7e08bd87ac744f7596eb813127c507792e943897b29ed8e4",
   "pins" : [
     {
-      "identity" : "opengraph",
+      "identity" : "darwinprivateframeworks",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/OpenSwiftUIProject/OpenGraph.git",
+      "location" : "https://github.com/OpenSwiftUIProject/DarwinPrivateFrameworks.git",
       "state" : {
-        "revision" : "695b7a0a1e3b61047f5fba22dbe06d3676dffb0d",
-        "version" : "0.0.8"
+        "revision" : "cab10e11f4ad918b3556b5ccaddd0aabb4cd8652",
+        "version" : "0.0.1"
       }
     },
     {
@@ -28,5 +29,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
