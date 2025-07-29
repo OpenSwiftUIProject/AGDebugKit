@@ -10,17 +10,34 @@ import AttributeGraph
 import AGDebugKit
 
 struct ExtraExample: View {
-    @State private var count = 0
+
     var body: some View {
-        VStack {
-            Text("Count: \(count)")
-            Button("Increase") {
-                count += 1
-            }
+        ZStack {
+            StaticView()
+            DynamicView()
+        }
+    }
+
+    struct StaticView: View {
+        var body: some View {
             ChildView()
         }
     }
+
+    struct DynamicView: View {
+        @State private var count = 0
+        var body: some View {
+            VStack {
+                Text("Count: \(count)")
+                Button("Increase") {
+                    count += 1
+                }
+                ChildView()
+            }
+        }
+    }
 }
+
 
 struct ChildView: View {
     var body: some View {
