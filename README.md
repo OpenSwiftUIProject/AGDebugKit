@@ -6,6 +6,8 @@ If you need JSON result visualization, you can refer to [GraphConverter](https:/
 
 If you need SwiftUI debug information, you can refer to [SwiftUIViewDebug](https://github.com/OpenSwiftUIProject/SwiftUIViewDebug)
 
+Note that only macOS and iPhone simulator are supported for now. And I only tested it on macOS 15.5 and iOS 18.5.
+
 ## Example
 
 ![Demo App Console](Resources/demo_app.png)
