@@ -142,7 +142,7 @@ struct _GraphFetcher: View {
     var body: Never { fatalError("Unimplemented") }
 
     static func _makeView(view: _GraphValue<Self>, inputs: _ViewInputs) -> _ViewOutputs {
-        if let current = AGSubgraph.current {
+        if let current = Subgraph.current {
             let graph = current.graph
             if #available(macOS 14, *) {
                 AGDebugModifier.sharedGraphbitPattern = unsafeBitCast(graph, to: Int.self)

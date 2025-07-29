@@ -31,7 +31,7 @@ public final class DebugServer {
         guard let _ = server,
               let url = AGDebugServer.copyURL()
         else { return nil }
-        return url.takeUnretainedValue() as URL
+        return url as URL
     }
     
     /// A Bool value indicating whether the server has been started successfully

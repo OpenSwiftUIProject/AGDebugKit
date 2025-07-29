@@ -1,6 +1,4 @@
-// swift-tools-version: 6.0
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
+// swift-tools-version: 6.1
 import PackageDescription
 
 let releaseVersion = Context.environment["DARWIN_PRIVATE_FRAMEWORKS_TARGET_RELEASE"].flatMap { Int($0) } ?? 2024
@@ -10,6 +8,10 @@ let platforms: [SupportedPlatform] = switch releaseVersion {
     default: []
 }
 
+let sharedSwiftSettings: [SwiftSetting] = [
+    .swiftLanguageMode(.v5),
+]
+
 let package = Package(
     name: "AGDebugKit",
     platforms: platforms,
@@ -17,7 +19,7 @@ let package = Package(
         .library(name: "AGDebugKit", targets: ["AGDebugKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/OpenSwiftUIProject/DarwinPrivateFrameworks.git", exact: "0.0.1"),
+        .package(url: "https://github.com/OpenSwiftUIProject/DarwinPrivateFrameworks.git", exact: "0.0.2"),
         .package(url: "https://github.com/OpenSwiftUIProject/Socket.git", from: "0.3.3"),
     ],
     targets: [
@@ -26,8 +28,7 @@ let package = Package(
             dependencies: [
                 .product(name: "AttributeGraph", package: "DarwinPrivateFrameworks"),
             ],
-            swiftSettings: [
-                .swiftLanguageMode(.v5),
+            swiftSettings: sharedSwiftSettings + [
                 .enableExperimentalFeature("AccessLevelOnImport"),
             ]
         ),
@@ -37,9 +38,7 @@ let package = Package(
             dependencies: [
                 "AGDebugKit",
             ],
-            swiftSettings: [
-                .swiftLanguageMode(.v5),
-            ]
+            swiftSettings: sharedSwiftSettings
         ),
         // A client sending command to AGDebugServer
         .executableTarget(
@@ -48,13 +47,12 @@ let package = Package(
                 "AGDebugKit",
                 .product(name: "Socket", package: "Socket"),
             ],
-            swiftSettings: [
-                .swiftLanguageMode(.v5),
-            ]
+            swiftSettings: sharedSwiftSettings
         ),
         .testTarget(
             name: "AGDebugKitTests",
-            dependencies: ["AGDebugKit"]
+            dependencies: ["AGDebugKit"],
+            swiftSettings: sharedSwiftSettings
         ),
     ]
 )
