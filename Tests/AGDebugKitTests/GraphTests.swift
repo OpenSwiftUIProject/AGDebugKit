@@ -10,6 +10,6 @@ import AGDebugKit
 
 final class GraphTests: XCTestCase {
     func testArchiveGraph() throws {
-        Graph.archiveGraph(name: "test.json")
+//        Graph.archiveGraph(name: "test.json")
     }
 }

@@ -30,6 +30,7 @@ let package = Package(
             ],
             swiftSettings: sharedSwiftSettings + [
                 .enableExperimentalFeature("AccessLevelOnImport"),
+                .enableUpcomingFeature("InternalImportsByDefault"),
             ]
         ),
         // A demo app showing how to use AGDebugKit

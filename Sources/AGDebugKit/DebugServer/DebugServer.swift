@@ -5,8 +5,8 @@
 //  Created by Kyle on 2024/1/21.
 //
 
-private import AttributeGraph
-import Foundation
+import AttributeGraph
+public import Foundation
 
 public final class DebugServer {
     private var server: AGDebugServer?

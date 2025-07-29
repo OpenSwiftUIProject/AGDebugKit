@@ -1,18 +1,17 @@
 //
 //  ContentView.swift
+//  AGDebugKit
 //
-//
-//  Created by Kyle on 2024/1/21.
+//  Created by Kyle on 2025/7/29.
 //
 
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, World!")
+        VStack {
+            ExtraExample()
+            ViewExample.Inner()
+        }
     }
-}
-
-#Preview {
-    ContentView()
 }
