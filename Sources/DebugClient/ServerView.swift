@@ -11,23 +11,67 @@ import AttributeGraph
 
 @Observable
 final class ServerState {
-    var server: DebugServer?
+    private let logger = Logger(subsystem: "org.OpenSwiftUIProject.AGDebugKit", category: "DebugServer")
+    
+    private var server: DebugServer?
 
     var enableNetwork = false
 
-    var started: Bool {
-        server != nil
-    }
+    private(set) var started: Bool = false
 
     var timeout: Int32 = 1
 
-    var url: URL?
+    private(set) var url: URL?
 
-    var host = ""
-    var port: UInt16 = 0
-    var token = 0
+    private(set) var host = ""
+    private(set) var port: UInt16 = 0
+    private(set) var token = 0
 
     init() {}
+    
+    func startServer() {
+        let mode: DebugServer.Mode = enableNetwork ? [.valid, .networkInterface] : [.valid]
+        guard let server = DebugServer.start(mode: mode),
+              let url = DebugServer.copyURL() as? URL,
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        else {
+            logger.error("Failed to start DebugServer")
+            return
+        }
+        self.server = server
+        self.started = true
+
+        self.url = url
+        if let host = components.host {
+            self.host = host
+        }
+        if let port = components.port {
+            self.port = UInt16(port)
+        }
+        if let queryItems = components.queryItems,
+           let tokenItem = queryItems.first(where: { $0.name == "token" }),
+           let tokenValue = tokenItem.value,
+           let token = Int(tokenValue) {
+            self.token = token
+        }
+        logger.info("Server started successfully")
+    }
+    
+    func stopServer() {
+        DebugServer.stop()
+        server = nil
+        started = false
+        url = nil
+        host = ""
+        port = 0
+        token = 0
+        logger.info("Server stopped")
+    }
+    
+    func runDebugSession() {
+        DebugServer.run(timeout: timeout)
+        logger.info("Debug session started with timeout: \(self.timeout)")
+    }
 }
 
 struct ServerView: View {
@@ -56,15 +100,15 @@ struct ServerView: View {
                     
                     Button(serverState.started ? "Stop Server" : "Start Server") {
                         if serverState.started {
-                            stopServer()
+                            serverState.stopServer()
                         } else {
-                            startServer()
+                            serverState.startServer()
                         }
                     }
                 }
                 if serverState.started {
                     Button("Run Debug Session") {
-                        runDebugSession()
+                        serverState.runDebugSession()
                     }
                 }
             }
@@ -84,47 +128,5 @@ struct ServerView: View {
         }
         .buttonStyle(.bordered)
         .formStyle(.grouped)
-    }
-    
-    private func startServer() {
-        let mode: DebugServer.Mode = serverState.enableNetwork ? [.valid, .networkInterface] : [.valid]
-        guard let server = DebugServer.start(mode: mode),
-              let url = DebugServer.copyURL() as? URL,
-              let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        else {
-            logger.error("Failed to start DebugServer")
-            return
-        }
-        serverState.server = server
-
-        serverState.url = url
-        if let host = components.host {
-            serverState.host = host
-        }
-        if let port = components.port {
-            serverState.port = UInt16(port)
-        }
-        if let queryItems = components.queryItems,
-           let tokenItem = queryItems.first(where: { $0.name == "token" }),
-           let tokenValue = tokenItem.value,
-           let token = Int(tokenValue) {
-            serverState.token = token
-        }
-        logger.info("Server started successfully")
-    }
-    
-    private func stopServer() {
-        DebugServer.stop()
-        serverState.server = nil
-        serverState.url = nil
-        serverState.host = ""
-        serverState.port = 0
-        serverState.token = 0
-        logger.info("Server stopped")
-    }
-    
-    private func runDebugSession() {
-        DebugServer.run(timeout: serverState.timeout)
-        logger.info("Debug session started with timeout: \(serverState.timeout)")
     }
 }
