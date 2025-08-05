@@ -19,8 +19,9 @@ let package = Package(
         .library(name: "AGDebugKit", targets: ["AGDebugKit"]),
     ],
     dependencies: [
+        .package(path: "../OpenGraph"),
+//        .package(url: "https://github.com/OpenSwiftUIProject/OpenGraph.git", exact: "0.0.2"),
         .package(url: "https://github.com/OpenSwiftUIProject/DarwinPrivateFrameworks.git", exact: "0.0.2"),
-        .package(url: "https://github.com/OpenSwiftUIProject/Socket.git", from: "0.3.3"),
     ],
     targets: [
         .target(
@@ -46,7 +47,7 @@ let package = Package(
             name: "DebugClient",
             dependencies: [
                 "AGDebugKit",
-                .product(name: "Socket", package: "Socket"),
+                .product(name: "OpenGraphShims", package: "OpenGraph"),
             ],
             swiftSettings: sharedSwiftSettings
         ),
