@@ -16,13 +16,11 @@ struct ContentView: View {
             HStack {
                 Text("AG Debug Kit")
                     .font(.title)
-                
                 Spacer()
-                
                 Toggle("Show Server", isOn: $showServerView)
             }
             .padding()
-            // ClientView()
+            ClientView()
             if showServerView {
                 Divider()
                 ServerView()
