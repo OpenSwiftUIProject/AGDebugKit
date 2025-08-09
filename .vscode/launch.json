@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:AGDebugKit}",
+            "name": "Debug DemoApp",
+            "program": "${workspaceFolder:AGDebugKit}/.build/debug/DemoApp",
+            "preLaunchTask": "swift: Build Debug DemoApp"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:AGDebugKit}",
+            "name": "Release DemoApp",
+            "program": "${workspaceFolder:AGDebugKit}/.build/release/DemoApp",
+            "preLaunchTask": "swift: Build Release DemoApp"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:AGDebugKit}",
+            "name": "Debug DebugClient",
+            "program": "${workspaceFolder:AGDebugKit}/.build/debug/DebugClient",
+            "preLaunchTask": "swift: Build Debug DebugClient"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:AGDebugKit}",
+            "name": "Release DebugClient",
+            "program": "${workspaceFolder:AGDebugKit}/.build/release/DebugClient",
+            "preLaunchTask": "swift: Build Release DebugClient"
+        }
+    ]
+}

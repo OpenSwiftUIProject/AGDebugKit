@@ -10,7 +10,7 @@ import SwiftUI
 @available(macOS 14.0, *)
 struct ContentView: View {
     @State private var showServerView = false
-    
+
     var body: some View {
         VStack {
             HStack {

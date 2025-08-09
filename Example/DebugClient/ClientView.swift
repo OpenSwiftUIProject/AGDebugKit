@@ -157,7 +157,7 @@ struct ClientView: View {
             Section("Client Connection") {
                 TextField("Server URL", text: $client.urlString)
                     .textFieldStyle(.roundedBorder)
-                
+
                 HStack {
                     statusIndicator
                     Spacer()
@@ -190,11 +190,11 @@ struct ClientView: View {
                     .onChange(of: client.selectedCommand) { _, _ in
                         client.updateCommandJSON()
                     }
-                    
-                    TextField("Command JSON", text: $client.commandJSON, axis: .vertical)
+                    TextEditor(text: $client.commandJSON)
                         .textFieldStyle(.roundedBorder)
-                        .lineLimit(3...6)
-                    
+                        .multilineTextAlignment(.leading)
+                        .frame(minHeight: 200)
+
                     HStack {
                         Button("Send") {
                             Task { try await client.sendCommand() }

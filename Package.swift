@@ -19,8 +19,6 @@ let package = Package(
         .library(name: "AGDebugKit", targets: ["AGDebugKit"]),
     ],
     dependencies: [
-        .package(path: "../OpenGraph"),
-//        .package(url: "https://github.com/OpenSwiftUIProject/OpenGraph.git", exact: "0.0.2"),
         .package(url: "https://github.com/OpenSwiftUIProject/DarwinPrivateFrameworks.git", exact: "0.0.2"),
     ],
     targets: [
@@ -39,15 +37,6 @@ let package = Package(
             name: "DemoApp",
             dependencies: [
                 "AGDebugKit",
-            ],
-            swiftSettings: sharedSwiftSettings
-        ),
-        // A client sending command to AGDebugServer
-        .executableTarget(
-            name: "DebugClient",
-            dependencies: [
-                "AGDebugKit",
-                .product(name: "OpenGraphShims", package: "OpenGraph"),
             ],
             swiftSettings: sharedSwiftSettings
         ),
