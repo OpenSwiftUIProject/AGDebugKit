@@ -30,6 +30,7 @@ final class Client {
     var urlString = ""
     var token: UInt32 = 0
     var selectedCommand: DebugClient.Command = .graphDescription
+    var commandJSON = ""
 
     var commandLocked = false
     var output = ""
@@ -92,15 +93,32 @@ final class Client {
         }
     }
 
-    private func data(for command: Command) throws -> Data{
-        let command = ["command": command.rawValue]
-        return try JSONSerialization.data(withJSONObject: command)
+    private func data(for jsonString: String) throws -> Data {
+        guard let data = jsonString.data(using: .utf8) else {
+            throw ClientError.invalidJSON
+        }
+        // Validate it's valid JSON
+        _ = try JSONSerialization.jsonObject(with: data)
+        return data
+    }
+
+    private func defaultJSON(for command: Command) -> String {
+        let commandDict = ["command": command.rawValue]
+        guard let data = try? JSONSerialization.data(withJSONObject: commandDict, options: .prettyPrinted),
+              let jsonString = String(data: data, encoding: .utf8) else {
+            return "{ \"command\": \"\(command.rawValue)\" }"
+        }
+        return jsonString
+    }
+
+    func updateCommandJSON() {
+        commandJSON = defaultJSON(for: selectedCommand)
     }
 
     func sendCommand() async throws {
         commandLocked = true
-        try await debugClient.sendMessage(token: token, data: data(for: selectedCommand))
-        logger.info("Sending command: \(self.selectedCommand.rawValue)")
+        try await debugClient.sendMessage(token: token, data: data(for: commandJSON))
+        logger.info("Sending command: \(self.commandJSON)")
     }
     
     func readResponse() async throws {
@@ -116,6 +134,10 @@ final class Client {
         outputDate = Date.now
         logger.info("Response: \(string)")
     }
+}
+
+enum ClientError: Error {
+    case invalidJSON
 }
 
 @available(macOS 14.0, *)
@@ -166,9 +188,17 @@ struct ClientView: View {
                     }
                     .pickerStyle(.segmented)
                     .disabled(client.commandLocked)
+                    .onChange(of: client.selectedCommand) { _, _ in
+                        client.updateCommandJSON()
+                    }
+                    
+                    TextField("Command JSON", text: $client.commandJSON, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                        .lineLimit(3...6)
+                        .disabled(client.commandLocked)
                     
                     HStack {
-                        Button("Send Command") {
+                        Button("Send") {
                             Task { try await client.sendCommand() }
                         }
                         .disabled(!canSendCommand)
@@ -198,6 +228,9 @@ struct ClientView: View {
         }
         .buttonStyle(.bordered)
         .formStyle(.grouped)
+        .onAppear {
+            client.updateCommandJSON()
+        }
     }
     
     private var isConnected: Bool {
