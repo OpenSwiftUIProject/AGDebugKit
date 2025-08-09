@@ -32,7 +32,6 @@ final class Client {
     var selectedCommand: DebugClient.Command = .graphDescription
     var commandJSON = ""
 
-    var commandLocked = false
     var output = ""
     var outputDate: Date?
 
@@ -63,7 +62,6 @@ final class Client {
 
     func disconnect() {
         debugClient.disconnect()
-        commandLocked = false
         output = ""
         outputDate = nil
         logger.info("Disconnected from server")
@@ -106,7 +104,11 @@ final class Client {
         let commandDict = ["command": command.rawValue]
         guard let data = try? JSONSerialization.data(withJSONObject: commandDict, options: .prettyPrinted),
               let jsonString = String(data: data, encoding: .utf8) else {
-            return "{ \"command\": \"\(command.rawValue)\" }"
+            return #"""
+            {
+                "command": " \#(command.rawValue)"
+            }
+            """#
         }
         return jsonString
     }
@@ -116,13 +118,11 @@ final class Client {
     }
 
     func sendCommand() async throws {
-        commandLocked = true
         try await debugClient.sendMessage(token: token, data: data(for: commandJSON))
         logger.info("Sending command: \(self.commandJSON)")
     }
     
     func readResponse() async throws {
-        commandLocked = false
         let (_, data) = try await debugClient.receiveMessage()
         logger.info("Response received")
         // TODO: Issue for sending start/stop profile command
@@ -149,7 +149,7 @@ struct ClientView: View {
     }
     
     private var canSendCommand: Bool {
-        client.connectionState == .ready && !client.commandLocked
+        client.connectionState == .ready
     }
     
     var body: some View {
@@ -187,7 +187,6 @@ struct ClientView: View {
                         Text("Command")
                     }
                     .pickerStyle(.segmented)
-                    .disabled(client.commandLocked)
                     .onChange(of: client.selectedCommand) { _, _ in
                         client.updateCommandJSON()
                     }
@@ -195,7 +194,6 @@ struct ClientView: View {
                     TextField("Command JSON", text: $client.commandJSON, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(3...6)
-                        .disabled(client.commandLocked)
                     
                     HStack {
                         Button("Send") {
@@ -203,11 +201,10 @@ struct ClientView: View {
                         }
                         .disabled(!canSendCommand)
                         
-                        if client.commandLocked {
-                            Button("Read Response") {
-                                Task { try await client.readResponse() }
-                            }
+                        Button("Read Response") {
+                            Task { try await client.readResponse() }
                         }
+                        .disabled(!canSendCommand)
                     }
                 }
                 Section {
